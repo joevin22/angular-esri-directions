@@ -5,10 +5,14 @@ import { HttpModule } from '@angular/http';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { MainComponent } from './main/main.component';
+import { EsriMapComponent } from './map/map.component';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    MainComponent,
+    EsriMapComponent
   ],
   imports: [
     BrowserModule,
