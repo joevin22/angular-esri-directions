@@ -1,6 +1,10 @@
 # Angular2EsriLoader
 
+This project's test integrating Angular4 + ESRI Map 3.20.
+
+
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 1.0.0.
+This project is based from [angular2-esri-loader](https://github.com/tomwayson/angular2-esri-loader).
 
 ## Development server
 
@@ -26,3 +30,5 @@ Before running the tests make sure you are serving the app via `ng serve`.
 ## Further help
 
 To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+
+To get documentation of ESRI [ESRI Javascript v3](https://developers.arcgis.com/javascript/3/)
