@@ -1,0 +1,155 @@
+import { Component, OnInit, ViewChild, ElementRef } from "@angular/core";
+
+import { EsriLoaderService } from "./esri-loader.service";
+import { MapService } from "./map.service";
+
+@Component({
+  selector: "app-esri-map",
+  providers: [EsriLoaderService, MapService],
+  templateUrl: "./map.component.html",
+  styleUrls: ["./map.component.scss"]
+})
+export class EsriMapComponent implements OnInit {
+  //@ViewChild("map") mapEl: ElementRef;
+
+  map: any;
+
+  cred: string = "esriuser";
+
+  constructor(private esriLoader: EsriLoaderService, private mapService: MapService) { }
+
+  ngOnInit() {
+
+    const self = this;
+
+    // only load the ArcGIS API for JavaScript when this component is loaded
+    return this.esriLoader.load({
+      // use a specific version of the API instead of the latest
+      url: "https://js.arcgis.com/3.20/"
+    }).then(() => {
+      // load the map class needed to create a new map
+      this.esriLoader.loadModules([
+        "dojo/_base/unload",
+        "dojo/cookie",
+        "dojo/json",
+        "esri/arcgis/OAuthInfo", "esri/arcgis/Portal",
+        "dojo/parser", "esri/config", "esri/IdentityManager", "esri/layers/FeatureLayer",
+        "esri/urlUtils", "esri/map", "esri/dijit/Directions",
+        "dojo/ready", "esri/arcgis/utils", "esri/dijit/Legend", "esri/dijit/Scalebar", "dojo/dom",
+        "dijit/layout/BorderContainer",
+        "dijit/layout/ContentPane",
+        "dojo/domReady!",
+      ]).then(([
+        baseUnload,
+        cookie,
+        JSON,
+        OAuthInfo, arcgisPortal,
+        parser, esriConfig, esriId, FeatureLayer,
+        urlUtils, Map, Directions,
+        ready, arcgisUtils, Legend, Scalebar, dom
+      ]) => {
+
+        // store credentials/serverInfos before the page unloads
+        baseUnload.addOnUnload(storeCredentials);
+        console.log('user info', esriId);
+
+        // look for credentials in local storage
+        loadCredentials();
+
+        ready(function () {
+
+          parser.parse();
+
+          var map = new Map(document.getElementById('exemple-map'), {
+            center: [-1.5533600, 47.2172500],
+            zoom: 8,
+            basemap: 'streets'
+          });
+
+          //console.log('map created ', response);
+          //add the scalebar
+          var scalebar = new Scalebar({
+            map: map,
+            scalebarUnit: "metric"
+          });
+
+          //add the legend. Note that we use the utility method getLegendLayers to get
+          //the layers to display in the legend from the createMap response.
+          /*
+          var legendLayers = arcgisUtils.getLegendLayers(response);
+          var legendDijit = new Legend({
+            map: map,
+            layerInfos: legendLayers
+          },"legend");
+          legendDijit.startup();
+          */
+
+          var directions = new Directions({
+            map: map
+            // --------------------------------------------------------------------
+            // New constuctor option and property showSaveButton added at version
+            // 3.17 to allow saving route. For more information see the API Reference.
+            // https://developers.arcgis.com/javascript/3/jsapi/directions-amd.html#showsavebutton
+            //
+            // Uncomment the line below to add the save button to the Directions widget
+            // --------------------------------------------------------------------
+            // , showSaveButton: true
+          }, "dir");
+          directions.startup();
+
+        });
+
+        function loadCredentials() {
+          var idJson, idObject;
+
+          if (supports_local_storage()) {
+            // read from local storage
+            idJson = window.localStorage.getItem(self.cred);
+          }
+          else {
+            // read from a cookie
+            idJson = cookie(self.cred);
+          }
+
+          if (idJson && idJson != "null" && idJson.length > 4) {
+            idObject = JSON.parse(idJson);
+            esriId.initialize(idObject);
+          }
+          else {
+            console.log("didn't find anything to load :(");
+          }
+        }
+
+        function storeCredentials() {
+          // make sure there are some credentials to persist
+          console.log('user info', esriId);
+          if (esriId.credentials.length === 0) {
+            return;
+          }
+
+          // serialize the ID manager state to a string
+          var idString = JSON.stringify(esriId.toJson());
+          // store it client side
+          if (supports_local_storage()) {
+            // use local storage
+            window.localStorage.setItem(self.cred, idString);
+            // console.log("wrote to local storage");
+          }
+          else {
+            // use a cookie
+            cookie(self.cred, idString, { expires: 1 });
+            // console.log("wrote a cookie :-/");
+          }
+        }
+
+        function supports_local_storage() {
+          try {
+            return "localStorage" in window && window["localStorage"] !== null;
+          } catch (e) {
+            return false;
+          }
+        }
+      });
+    });
+  }
+}

@@ -5,6 +5,8 @@
 /tmp
 /out-tsc
 
+/electron-v1-app-*
+
 # dependencies
 /node_modules
 
