@@ -1,11 +1,11 @@
 import 'rxjs/add/operator/map';
 
-import {Injectable} from '@angular/core';
+import { Injectable, ElementRef } from '@angular/core';
 import {bootstrap, dojoRequire, isLoaded} from 'esri-loader';
 import {Observable} from 'rxjs/Observable';
 import {Observer} from 'rxjs/Observer';
 
-import {EsriLoaderService} from '../services/esri-loader.service';
+import { EsriLoaderService } from 'angular-esri-loader';
 
 @Injectable()
 export class MapService {
